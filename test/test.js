@@ -4,6 +4,9 @@
 
 var Pouch = require('pouchdb');
 var Mapreduce = require('../');
+// for the purposes of testing the fork, override the default query
+Mapreduce.query = Mapreduce._search_query;
+Mapreduce.viewCleanup = Mapreduce._search_viewCleanup;
 Pouch.plugin(Mapreduce);
 var chai = require('chai');
 var should = chai.should();

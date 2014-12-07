@@ -681,7 +681,7 @@ var localViewCleanup = utils.sequentialize(mainQueue, function (db) {
   }, defaultsTo({ok: true}));
 });
 
-exports.viewCleanup = utils.callbackify(function () {
+exports._search_viewCleanup = utils.callbackify(function () {
   var db = this;
   if (db.type() === 'http') {
     return httpViewCleanup(db);
@@ -782,7 +782,7 @@ function queryPromised(db, fun, opts) {
   }
 }
 
-exports.query = function (fun, opts, callback) {
+exports._search_query = function (fun, opts, callback) {
   if (typeof opts === 'function') {
     callback = opts;
     opts = {};
