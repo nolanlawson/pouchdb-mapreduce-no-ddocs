@@ -7,10 +7,11 @@ function createView(opts) {
   var mapFun = opts.map;
   var reduceFun = opts.reduce;
   var temporary = opts.temporary;
+  var saveAs = opts.saveAs;
 
   // the "undefined" part is for backwards compatibility
   var viewSignature = mapFun.toString() + (reduceFun && reduceFun.toString()) +
-    'undefined';
+    'undefined' + (saveAs || '');
 
   var cachedViews;
   if (!temporary) {
@@ -23,26 +24,35 @@ function createView(opts) {
 
   var promiseForView = sourceDB.info().then(function (info) {
 
-    var depDbName = info.db_name + '-mrview-' +
-      (temporary ? 'temp' : stringMd5(viewSignature));
-
-    // save the view name in the source db so it can be cleaned up if necessary
-    // (e.g. when the _design doc is deleted, remove all associated view data)
-    function diffFunction(doc) {
-      doc.views = doc.views || {};
-      var fullViewName = viewName;
-      if (fullViewName.indexOf('/') === -1) {
-        fullViewName = viewName + '/' + viewName;
-      }
-      var depDbs = doc.views[fullViewName] = doc.views[fullViewName] || {};
-      /* istanbul ignore if */
-      if (depDbs[depDbName]) {
-        return; // no update necessary
-      }
-      depDbs[depDbName] = true;
-      return doc;
+    var depDbName = info.db_name + '-';
+    if (saveAs) {
+      depDbName += saveAs;
+    } else {
+      depDbName += 'mrview-' + (temporary ? 'temp' : stringMd5(viewSignature));
     }
-    return upsert(sourceDB, '_local/mrviews', diffFunction).then(function () {
+
+    function registerMrView() {
+      // save the view name in the source db so it can be cleaned up if necessary
+      // (e.g. when the _design doc is deleted, remove all associated view data)
+      function diffFunction(doc) {
+        doc.views = doc.views || {};
+        var fullViewName = viewName;
+        if (fullViewName.indexOf('/') === -1) {
+          fullViewName = viewName + '/' + viewName;
+        }
+        var depDbs = doc.views[fullViewName] = doc.views[fullViewName] || {};
+        /* istanbul ignore if */
+        if (depDbs[depDbName]) {
+          return; // no update necessary
+        }
+        depDbs[depDbName] = true;
+        return doc;
+      }
+
+      return upsert(sourceDB, '_local/mrviews', diffFunction);
+    }
+
+    function registerDependentDb() {
       return sourceDB.registerDependentDatabase(depDbName).then(function (res) {
         var db = res.db;
         db.auto_compaction = true;
@@ -69,7 +79,13 @@ function createView(opts) {
           return view;
         });
       });
-    });
+    }
+
+    if (viewName) {
+      return registerMrView().then(registerDependentDb);
+    } else {
+      return registerDependentDb();
+    }
   });
 
   if (cachedViews) {

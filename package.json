@@ -10,7 +10,11 @@
   "jsnext:main": "./src/index.js",
   "scripts": {
     "build": "node bin/build-module.js ./",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "test": "npm run build && mocha --bail test/test.js",
+    "test-phantom": "npm run build && zuul --no-coverage --phantom --ui mocha-bdd test/test.js",
+    "test-coverage": "istanbul cover ./node_modules/mocha/bin/_mocha test/test.js && istanbul check-coverage --lines 100 --function 100 --statements 100 --branches 99",
+    "test-local": "npm run build && zuul --no-coverage --local 9000 --ui mocha-bdd test/test.js"
   },
   "files": [
     "lib",
@@ -32,9 +36,14 @@
     "./lib/index.js": "./lib/index-browser.js"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
     "denodeify": "^1.2.1",
     "lie": "^3.0.4",
     "mkdirp": "^0.5.1",
+    "mocha": "^2.5.3",
+    "phantomjs-prebuilt": "^2.1.7",
+    "pouchdb-memory": "^1.1.0",
     "rimraf": "^2.5.2",
     "rollup": "^0.33.0",
     "rollup-plugin-node-resolve": "^1.7.1"

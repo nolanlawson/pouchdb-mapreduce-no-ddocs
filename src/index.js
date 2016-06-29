@@ -869,6 +869,37 @@ function queryPromised(db, fun, opts) {
     return customQuery(db, fun, opts);
   }
 
+  function onViewReady(view) {
+    if (opts.stale === 'ok' || opts.stale === 'update_after') {
+      if (opts.stale === 'update_after') {
+        process.nextTick(function () {
+          updateView(view);
+        });
+      }
+      return queryView(view, opts);
+    } else { // stale not ok
+      return updateView(view).then(function () {
+        return queryView(view, opts);
+      });
+    }
+  }
+
+  if (opts.saveAs) {
+    var autoOptions = {
+      db: db,
+      saveAs: opts.saveAs,
+      map: fun.map,
+      reduce: fun.reduce
+    };
+    if (opts.destroy) {
+      return createView(autoOptions).then(function (view) {
+        return view.db.destroy();
+      });
+    }
+    checkQueryParseError(opts, fun);
+    return createView(autoOptions).then(onViewReady);
+  }
+
   if (typeof fun !== 'string') {
     // temp_view
     checkQueryParseError(opts, fun);
@@ -891,43 +922,33 @@ function queryPromised(db, fun, opts) {
       });
     });
     return tempViewQueue.finish();
-  } else {
-    // persistent view
-    var fullViewName = fun;
-    var parts = parseViewName(fullViewName);
-    var designDocName = parts[0];
-    var viewName = parts[1];
-    return db.get('_design/' + designDocName).then(function (doc) {
-      var fun = doc.views && doc.views[viewName];
-
-      if (!fun || typeof fun.map !== 'string') {
-        throw new NotFoundError('ddoc ' + designDocName +
-        ' has no view named ' + viewName);
-      }
-      checkQueryParseError(opts, fun);
-
-      var createViewOpts = {
-        db : db,
-        viewName : fullViewName,
-        map : fun.map,
-        reduce : fun.reduce
-      };
-      return createView(createViewOpts).then(function (view) {
-        if (opts.stale === 'ok' || opts.stale === 'update_after') {
-          if (opts.stale === 'update_after') {
-            process.nextTick(function () {
-              updateView(view);
-            });
-          }
-          return queryView(view, opts);
-        } else { // stale not ok
-          return updateView(view).then(function () {
-            return queryView(view, opts);
-          });
-        }
-      });
-    });
   }
+
+
+  // persistent view
+  var fullViewName = fun;
+  var parts = parseViewName(fullViewName);
+  var designDocName = parts[0];
+  var viewName = parts[1];
+  return db.get('_design/' + designDocName).then(function (doc) {
+    var fun = doc.views && doc.views[viewName];
+
+    if (!fun || typeof fun.map !== 'string') {
+      throw new NotFoundError('ddoc ' + designDocName +
+        ' has no view named ' + viewName);
+    }
+    checkQueryParseError(opts, fun);
+
+    var createViewOpts = {
+      db : db,
+      viewName : fullViewName,
+      map : fun.map,
+      reduce : fun.reduce
+    };
+
+    return createView(createViewOpts).then(onViewReady);
+  });
+
 }
 
 var query = function (fun, opts, callback) {
@@ -939,6 +960,11 @@ var query = function (fun, opts, callback) {
 
   if (typeof fun === 'function') {
     fun = {map : fun};
+  }
+
+  if (fun.saveAs) {
+    opts.saveAs = fun.saveAs;
+    delete fun.saveAs;
   }
 
   var db = this;
@@ -986,6 +1012,6 @@ function BuiltInError(message) {
 inherits(BuiltInError, Error);
 
 export default {
-  query: query,
-  viewCleanup: viewCleanup
+  _search_query: query,
+  _search_viewCleanup: viewCleanup
 };
