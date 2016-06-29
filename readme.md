@@ -1,49 +1,24 @@
-Map Reduce No DDocs
-=====
+pouchdb-mapreduce-utils ![semver non-compliant](https://img.shields.io/badge/semver-non--compliant-red.svg)
+======
 
-[![Build Status](https://travis-ci.org/nolanlawson/pouchdb-mapreduce-no-ddocs.svg)](https://travis-ci.org/nolanlawson/pouchdb-mapreduce-no-ddocs)
+PouchDB utilities used by pouchdb-mapreduce.
 
-Fork of the [pouchdb-mapreduce](https://github.com/pouchdb/mapreduce) project to add additional APIs to allow secondary indexes without design docs.
+### Usage
 
-See [pouchdb/mapreduce#134](https://github.com/pouchdb/mapreduce/pull/134) and [pouchdb/mapreduce#184](https://github.com/pouchdb/mapreduce/pull/184) for why I decided to fork.
-
-**TLDR**: I don't like design docs, I needed this for [pouchdb-quick-search](https://github.com/nolanlawson/pouchdb-quick-search), and I couldn't convince myself or anyone else that it's really appropriate for mapreduce itself, so I did what's beautiful in open-source and just forked it.
-
-Hosted on npm:
-
-```
-npm install pouchdb-mapreduce-no-ddocs
+```bash
+npm install --save-exact pouchdb-mapreduce-utils
 ```
 
-Building
-----
+For full API documentation and guides on PouchDB, see [PouchDB.com](http://pouchdb.com/). For details on PouchDB sub-packages, see the [Custom Builds documentation](http://pouchdb.com/custom.html).
 
-    npm install
-    npm run build
+### Warning: semver-free zone!
 
-Testing
-----
+This package is conceptually an internal API used by PouchDB or its plugins. It does not follow semantic versioning (semver), and rather its version is pegged to PouchDB's. Use exact versions when installing, e.g. with `--save-exact`.
 
-### In Node
+### Source
 
-    npm test
+PouchDB and its sub-packages are distributed as a [monorepo](https://github.com/babel/babel/blob/master/doc/design/monorepo.md).
 
-To run coverage tests:
+For a full list of packages, see [the GitHub source](https://github.com/pouchdb/pouchdb/tree/master/packages).
 
-    npm run coverage
 
-To run individual tests:
-
-    GREP=my_search_term npm test
-
-### In the browser
-
-Run 
-
-    npm run dev
-    
-and then point your favorite browser to [http://127.0.0.1:8001/test/index.html](http://127.0.0.1:8001/test/index.html).
-
-To run individual tests, load e.g.:
-
-    http://127.0.0.1:8001/test/index.html?grep=my_search_term
