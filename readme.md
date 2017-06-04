@@ -1,3 +1,8 @@
+DEPRECATION NOTICE
+-----
+
+The best way forward is a custom build of PouchDB while removing [pouchdb-changes-filter](https://www.npmjs.com/package/pouchdb-changes-filter) and [pouchdb-mapreduce](https://www.npmjs.com/package/pouchdb-mapreduce) which are the only packages that contain the `eval()` code. This is not technically possible with PouchDB v6 but could be made possible in the future.
+
 pouchdb-mapreduce-utils ![semver non-compliant](https://img.shields.io/badge/semver-non--compliant-red.svg)
 ======
 
