@@ -1,7 +1,7 @@
-DEPRECATION NOTICE
+DEPRECATION NOTE
 -----
 
-The best way forward is a custom build of PouchDB while removing [pouchdb-changes-filter](https://www.npmjs.com/package/pouchdb-changes-filter) and [pouchdb-mapreduce](https://www.npmjs.com/package/pouchdb-mapreduce) which are the only packages that contain the `eval()` code. This is not technically possible with PouchDB v6 but could be made possible in the future.
+This project is essentially a hack designed to get [pouchdb-quick-search](https://github.com/nolanlawson/pouchdb-quick-search) to work correctly without creating DDocs. Probably the best path forward is to deprecate this project and have pouchdb-quick-search use [pouchdb-abstract-mapreduce](https://www.npmjs.com/package/pouchdb-abstract-mapreduce).
 
 pouchdb-mapreduce-utils ![semver non-compliant](https://img.shields.io/badge/semver-non--compliant-red.svg)
 ======
