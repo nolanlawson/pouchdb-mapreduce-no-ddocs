@@ -1,7 +1,7 @@
-DEPRECATION NOTE
+DEPRECATION NOTICE
 -----
 
-This project is essentially a hack designed to get [pouchdb-quick-search](https://github.com/nolanlawson/pouchdb-quick-search) to work correctly without creating DDocs. Probably the best path forward is to deprecate this project and have pouchdb-quick-search use [pouchdb-abstract-mapreduce](https://www.npmjs.com/package/pouchdb-abstract-mapreduce).
+This project is essentially a hack designed to get [pouchdb-quick-search](https://github.com/nolanlawson/pouchdb-quick-search) to work correctly without creating DDocs. Probably the best path forward is to deprecate this project and have pouchdb-quick-search use [pouchdb-abstract-mapreduce](https://www.npmjs.com/package/pouchdb-abstract-mapreduce), which is what's used by `pouchdb-mapreduce` and `pouchdb-find` under the hood. Removing DDocs is a convenience for users but makes it hard to keep this module up-to-date with mapreduce changes.
 
 pouchdb-mapreduce-utils ![semver non-compliant](https://img.shields.io/badge/semver-non--compliant-red.svg)
 ======
